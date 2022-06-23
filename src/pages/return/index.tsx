@@ -99,8 +99,13 @@ const Return: React.FC<ReturnType> = ({ bookList, dev }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  const [returnVisible, setReturnVisible] = useState(false)
+
   const handleReturnButton = async () => {
+    // MessagePlugin.info('正在还书，请稍后', 3 * 1000)
+    setReturnVisible(true)
     const borrowList = books.map(value => value.id)
+    // setReturnVisible(false)
     try {
       const response = await returnService.returnBook(borrowList)
       if (response.status === 200) {
@@ -139,7 +144,23 @@ const Return: React.FC<ReturnType> = ({ bookList, dev }) => {
         visible={putBookVisible}
         footer={false}
       >
-        <p>请放置书本</p>
+        <p>请放置图书</p>
+      </Dialog>
+      <Dialog
+        closeBtn={false}
+        closeOnEscKeydown
+        closeOnOverlayClick={false}
+        destroyOnClose={true}
+        draggable={false}
+        mode='modal'
+        placement='center'
+        preventScrollThrough={false}
+        showOverlay
+        theme='info'
+        visible={returnVisible}
+        footer={false}
+      >
+        <p>正在还书，请稍后</p>
       </Dialog>
       <div style={{ float: 'left', fontSize: 24 }}>图书列表</div>
       <Button
