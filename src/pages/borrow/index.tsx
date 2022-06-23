@@ -158,10 +158,12 @@ const Borrow: React.FC<BorrowType> = ({ bookList, dev }) => {
   }, [dev, navigate])
 
   useEffect(() => {
-    console.log('useEffect Hook')
     getReaderId()
     if (!bookList || bookList === [] || bookList.length === 0) {
-      setPutBookVisible(true)
+      // 应该是`!swipeTipsVisible`，但在这有bug，就改了一下
+      if (swipeTipsVisible) {
+        setPutBookVisible(true)
+      }
       setTimeout(() => {
         navigate('/', { replace: true })
       }, 5 * 1000)
@@ -172,6 +174,8 @@ const Borrow: React.FC<BorrowType> = ({ bookList, dev }) => {
   }, [])
 
   const [buttonDisable, setButtonDisable] = useState(false)
+
+  const [borrowVisible, setBorrowVisible] = useState(false)
 
   const handleBorrowButton = async () => {
     const bookIds = book.map(value => value.id)
@@ -185,10 +189,13 @@ const Borrow: React.FC<BorrowType> = ({ bookList, dev }) => {
       if (response.status === 200) {
         const result: boolean = response.data.result
         if (result) {
-          MessagePlugin.info('正在办理借阅，请稍后', 3 * 1000)
+          // MessagePlugin.info('正在办理借阅，请稍后', 3 * 1000)
+          setBorrowVisible(true)
           const response = await borrowService.createBorrow(readerId, bookIds)
+          // setBorrowVisible(false)
           if (response.status === 201) {
-            MessagePlugin.success('借阅成功', 5 * 1000)
+            const amount = response.data.amount
+            MessagePlugin.success(`借阅成功，押金剩余${amount}元`, 5 * 1000)
             navigate('/', { replace: true })
             return
           }
@@ -197,8 +204,10 @@ const Borrow: React.FC<BorrowType> = ({ bookList, dev }) => {
           return
         }
         if (!result) {
+          // 应该弹出modal，让用户确认
+          const amount = response.data.amount
           MessagePlugin.warning(
-            '借阅金额超出上限，请将部分图书放回书架',
+            `可用余额${amount}元，借阅金额超出上限，请将部分图书放回书架`,
             5 * 1000
           )
           navigate('/', { replace: true })
@@ -249,7 +258,23 @@ const Borrow: React.FC<BorrowType> = ({ bookList, dev }) => {
         visible={putBookVisible}
         footer={false}
       >
-        <p>请放置书本</p>
+        <p>请放置图书</p>
+      </Dialog>
+      <Dialog
+        closeBtn={false}
+        closeOnEscKeydown
+        closeOnOverlayClick={false}
+        destroyOnClose={true}
+        draggable={false}
+        mode='modal'
+        placement='center'
+        preventScrollThrough={false}
+        showOverlay
+        theme='info'
+        visible={borrowVisible}
+        footer={false}
+      >
+        <p>正在办理借阅，请稍后</p>
       </Dialog>
       <div style={{ float: 'left', fontSize: 24 }}>图书列表</div>
       <Button
