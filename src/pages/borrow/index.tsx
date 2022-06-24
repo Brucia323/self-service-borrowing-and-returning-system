@@ -194,8 +194,11 @@ const Borrow: React.FC<BorrowType> = ({ bookList, dev }) => {
           const response = await borrowService.createBorrow(readerId, bookIds)
           // setBorrowVisible(false)
           if (response.status === 201) {
-            const amount = response.data.amount
-            MessagePlugin.success(`借阅成功，押金剩余${amount}元`, 5 * 1000)
+            const amount: number = response.data.amount
+            MessagePlugin.success(
+              `借阅成功，押金剩余${amount.toFixed(2)}元`,
+              5 * 1000
+            )
             navigate('/', { replace: true })
             return
           }
@@ -207,7 +210,7 @@ const Borrow: React.FC<BorrowType> = ({ bookList, dev }) => {
           // 应该弹出modal，让用户确认
           const amount = response.data.amount
           MessagePlugin.warning(
-            `可用余额${amount}元，借阅金额超出上限，请前往前台充值押金`,
+            `可用余额${amount.toFixed(2)}元，借阅金额超出上限，请前往前台充值押金`,
             5 * 1000
           )
           navigate('/', { replace: true })
