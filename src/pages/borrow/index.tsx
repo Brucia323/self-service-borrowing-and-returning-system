@@ -207,7 +207,7 @@ const Borrow: React.FC<BorrowType> = ({ bookList, dev }) => {
           // 应该弹出modal，让用户确认
           const amount = response.data.amount
           MessagePlugin.warning(
-            `可用余额${amount}元，借阅金额超出上限，请将部分图书放回书架`,
+            `可用余额${amount}元，借阅金额超出上限，请前往前台充值押金`,
             5 * 1000
           )
           navigate('/', { replace: true })
